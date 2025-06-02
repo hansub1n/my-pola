@@ -3,9 +3,26 @@ import MobileFixedEllipseBackground from '@/components/background/MobileFixedEll
 import { getCurrentUserData } from '@/utils/supabase/auth';
 import StoreLink from '@/components/mypola/StoreLink';
 import DesktopMypolaContainer from '@/components/mypola/DesktopMypolaContainer';
+import { QueryClient } from '@tanstack/react-query';
+import { QUERY_KEYS } from '@/hooks/queries/queryKeys';
+import { getMyPolaDataOnServer } from '@/services/mypola/getMypolaDataOnServer';
 
 export default async function page() {
   const { id, nickname, mileage, point, level } = await getCurrentUserData();
+
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 24 * 60 * 60 * 1000,
+        gcTime: 24 * 60 * 60 * 1000,
+      },
+    },
+  });
+
+  await queryClient.prefetchQuery({
+    queryKey: QUERY_KEYS.mypola(id),
+    queryFn: getMyPolaDataOnServer,
+  });
 
   return (
     <div className='relative flex flex-col h-full pt-[14px]'>

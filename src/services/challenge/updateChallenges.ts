@@ -1,5 +1,8 @@
+import { MAX_MILEAGE } from '@/constants/levelInfo';
+import { QUERY_KEYS } from '@/hooks/queries/queryKeys';
 import { getClientUser } from '@/utils/supabase/authClient';
 import { createClient } from '@/utils/supabase/client';
+import { QueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
 export const updateCurrentChallenge = async (id: number, router: ReturnType<typeof useRouter>) => {
@@ -41,22 +44,43 @@ export const resetDailyChallenge = async () => {
 
 export const updatedoneChallenge = async (id: number) => {
   const client = createClient();
+  const queryClient = new QueryClient();
 
   const user = await getClientUser();
   if (!user) return null;
 
-  const { data: userData, error: fetchError } = await client.from('users').select('mileage').eq('id', user.id).single();
+  const { data: userData, error: fetchError } = await client
+    .from('users')
+    .select('mileage, level')
+    .eq('id', user.id)
+    .single();
 
   if (fetchError || !userData) {
     console.error('유저 정보를 가져오는데 실패했습니다.', fetchError);
     return;
   }
 
-  const newMileage = userData.mileage + 100;
+  const currentLevel = `level${userData.level}`;
+  let newMileage = userData.mileage + 100;
+
+  if (newMileage >= MAX_MILEAGE[currentLevel as keyof typeof MAX_MILEAGE]) {
+    const { error: updateError } = await client
+      .from('users')
+      .update({ level: userData.level + 1 })
+      .eq('id', user.id);
+
+    if (updateError) {
+      console.error('레벨 업데이트 실패', updateError);
+    }
+
+    newMileage = Math.max(0, newMileage - MAX_MILEAGE[currentLevel as keyof typeof MAX_MILEAGE]);
+  }
 
   const { error } = await client.from('users').update({ done_challenge_id: id, mileage: newMileage }).eq('id', user.id);
 
   if (error) {
     console.error('챌린지 데이터를 업데이트하는데 실패했습니다.', error);
   }
+
+  queryClient.invalidateQueries({ queryKey: QUERY_KEYS.mypola(user.id) });
 };

@@ -6,11 +6,12 @@ import MileageBar from './MileageBar';
 import { LEVEL_POLA_NAME } from '@/constants/levelInfo';
 import WeatherIcon from './WeatherIcon';
 import Mypola from './Mypola';
+import { useGetMypola } from '@/hooks/queries/useMypola';
 
 type MypolaContainerProps = {
+  id: string;
   level: number;
   mileage: number;
-  id: string;
 };
 
 const WEATHER_COLOR_MAP = {
@@ -21,9 +22,13 @@ const WEATHER_COLOR_MAP = {
   snowy: 'bg-primary-100',
 };
 
-export default function MypolaContainer({ level, mileage, id }: MypolaContainerProps) {
+export default function MypolaContainer({ id, level, mileage }: MypolaContainerProps) {
   const { position, isLoading: isGeolocationLoading } = useGeolocation();
   const { data: weather, isLoading: isWeatherLoading } = useWeather(position);
+  const { data: mypolaData } = useGetMypola(id);
+
+  const currentLevel = mypolaData?.level ?? level;
+  const currentMileage = mypolaData?.mileage ?? mileage;
 
   return (
     <div className='flex flex-col justify-between items-center w-[314px] h-full pb-[82px] mx-auto'>
@@ -42,17 +47,17 @@ export default function MypolaContainer({ level, mileage, id }: MypolaContainerP
       <div className='relative w-full h-[300px] flex flex-row justify-center items-end mb-[75px]'>
         <Mypola
           id={id}
-          level={level}
+          level={currentLevel}
         />
         <div className='w-[290px] h-[52px] bg-neutral-400 rounded-[50%] z-[0] translate-y-[26px] ' />
       </div>
       <div>
         <p className='font-semibold text-neutral-1000 text-[20px] text-center mb-[32px]'>
-          LEVEL. {level} {LEVEL_POLA_NAME[`level${level}` as keyof typeof LEVEL_POLA_NAME]}
+          LEVEL. {currentLevel} {LEVEL_POLA_NAME[`level${currentLevel}` as keyof typeof LEVEL_POLA_NAME]}
         </p>
         <MileageBar
-          mileage={mileage}
-          level={level}
+          mileage={currentMileage}
+          level={currentLevel}
         />
       </div>
     </div>
