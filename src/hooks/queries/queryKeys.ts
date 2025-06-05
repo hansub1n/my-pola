@@ -10,4 +10,5 @@ export const QUERY_KEYS = {
   equippedItemId: (userId?: string) => ['equippedItemId', userId],
   point: (userId?: string) => ['point', userId],
   clientUser: () => ['clientUser'],
+  mypola: (userId?: string) => ['mypola', userId],
 };
