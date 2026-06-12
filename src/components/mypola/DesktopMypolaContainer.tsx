@@ -8,6 +8,7 @@ import WeatherIcon from './WeatherIcon';
 import MileageBar from './MileageBar';
 import { LEVEL_POLA_NAME } from '@/constants/levelInfo';
 import Image from 'next/image';
+import { useGetMypola } from '@/hooks/queries/useMypola';
 
 type DesktopMypolaContainerProps = {
   level: number;
@@ -34,6 +35,10 @@ export default function DesktopMypolaContainer({
 }: DesktopMypolaContainerProps) {
   const { position, isLoading: isGeolocationLoading } = useGeolocation();
   const { data: weather, isLoading: isWeatherLoading } = useWeather(position);
+  const { data: mypolaData } = useGetMypola(id);
+
+  const currentLevel = mypolaData?.level ?? level;
+  const currentMileage = mypolaData?.mileage ?? mileage;
 
   return (
     <>
@@ -57,7 +62,7 @@ export default function DesktopMypolaContainer({
         </div>
         <div className='relative w-[200px] h-[300px] flex justify-center items-end mb-[20px]'>
           <Mypola
-            level={level}
+            level={currentLevel}
             id={id}
           />
           <Image
@@ -70,11 +75,11 @@ export default function DesktopMypolaContainer({
         </div>
         <div>
           <p className='font-semibold text-neutral-1000 text-[20px] text-center mb-[32px]'>
-            LEVEL. {level} {LEVEL_POLA_NAME[`level${level}` as keyof typeof LEVEL_POLA_NAME]}
+            LEVEL. {currentLevel} {LEVEL_POLA_NAME[`level${currentLevel}` as keyof typeof LEVEL_POLA_NAME]}
           </p>
           <MileageBar
-            mileage={mileage}
-            level={level}
+            mileage={currentMileage}
+            level={currentLevel}
           />
         </div>
       </div>

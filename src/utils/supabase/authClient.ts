@@ -8,3 +8,14 @@ export const getClientUser = async () => {
   }
   return data?.user ?? null;
 };
+
+export const getClientUserDataByUserId = async (userId: string) => {
+  const client = createClient();
+
+  const { data, error } = await client.from('users').select('*').eq('id', userId).single();
+  if (error) {
+    console.error('Failed to fetch client user data: ', error);
+  }
+
+  return data;
+};
