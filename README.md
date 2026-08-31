@@ -1,6 +1,11 @@
 # 마이폴라(my-pola)
 
-## [마이폴라 바로가기](https://my-pola.vercel.app/)
+## [마이폴라 바로가기](https://my-pola.vercel.app/) 
+> ⚠️ 이 프로젝트는 Supabase 백엔드 서비스 종료로 인해 
+> 현재 배포 사이트에서 실제 기능(로그인, 데이터 저장 등)은 동작하지 않습니다.
+> 전체 기능은 아래 데모 GIF 또는 스크린샷으로 확인해주세요.
+<img width="360" height="779" alt="demo_full" src="https://github.com/user-attachments/assets/e02e5734-4404-458d-93c0-2f251ccab0c9" />
+
 
 ## 👨‍🏫 프로젝트 소개
 
